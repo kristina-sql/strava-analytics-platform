@@ -1,0 +1,76 @@
+name: strava-elt-pipeline
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 20 * * *" # daily 05:00 UTC (change later)
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    env:
+      # Strava
+      STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+      STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+      STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+
+      # Neon (dbt + loader)
+      NEON_HOST: ${{ secrets.NEON_HOST }}
+      NEON_DB: ${{ secrets.NEON_DB }}
+      NEON_USER: ${{ secrets.NEON_USER }}
+      NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
+      NEON_PORT: ${{ secrets.NEON_PORT }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps (ingestion)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ingestion/requirements.txt
+
+      - name: Install dbt
+        run: |
+          pip install dbt-postgres
+
+      - name: Create dbt profile for Neon
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'YAML'
+          transformations:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: ${NEON_HOST}
+                user: ${NEON_USER}
+                password: ${NEON_PASSWORD}
+                port: ${NEON_PORT}
+                dbname: ${NEON_DB}
+                schema: analytics
+                threads: 4
+                sslmode: require
+          YAML
+
+      - name: Run ingestion (creates raw snapshot files on runner)
+        run: |
+          python ingestion/src/main.py
+
+      - name: Load raw snapshot into Neon
+        run: |
+          # Build DATABASE_URL for your load_to_neon.py
+          export DATABASE_URL="postgresql://${NEON_USER}:${NEON_PASSWORD}@${NEON_HOST}:${NEON_PORT}/${NEON_DB}?sslmode=require"
+          python ingestion/src/load_to_neon.py
+
+      - name: Run dbt (staging only)
+        working-directory: transformations
+        run: |
+          dbt debug
+          dbt run --select stg_strava_activities

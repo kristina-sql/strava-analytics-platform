@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: neondb.raw
+    database: neondb
+    description: strava raw table
+    schema: raw
+    tables: 
+      - name: strava_activities
+        description: raw strava data from API
+      
