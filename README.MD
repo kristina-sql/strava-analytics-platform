@@ -55,11 +55,31 @@ Tableau (Visualization)
 
 ## Repository Structure
 
-strava-analytics-platform/
-├── ingestion/ # Strava API ingestion (Python)
-├── transformations/ # dbt models (planned)
-├── visualization/ # Tableau assets (planned)
-└── README.md
+    strava-analytics-platform/
+    ├── assets/
+    │   └── images/
+    │       └── strava-logo.png
+    ├── ingestion/                     # Strava API ingestion (Python)
+    │   ├── src/
+    │   │   └── extract.py
+    │   ├── requirements.txt
+    │   └── README.md
+    ├── transformations/               # dbt project (planned)
+    │   ├── models/
+    │   │   ├── staging/               # stg_* models
+    │   │   └── marts/                 # facts & dimensions
+    │   │       ├── core/
+    │   │       │   ├── fct_activities.sql
+    │   │       │   ├── dim_athlete.sql
+    │   │       │   └── dim_activity_type.sql
+    │   │       └── README.md
+    ├── visualization/                 # Tableau assets (planned)
+    │   ├── dashboards/
+    │   └── screenshots/
+    ├── README.md
+    └── LICENSE
+
+
 
 ---
 
