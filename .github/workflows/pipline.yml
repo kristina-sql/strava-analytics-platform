@@ -52,7 +52,7 @@ jobs:
                 host: ${NEON_HOST}
                 user: ${NEON_USER}
                 password: ${NEON_PASSWORD}
-                port: ${NEON_PORT}
+                port: 5432
                 dbname: ${NEON_DB}
                 schema: analytics
                 threads: 4
