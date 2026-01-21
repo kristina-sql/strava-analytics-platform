@@ -43,7 +43,7 @@ jobs:
       - name: Create dbt profile for Neon
         run: |
           mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml << 'YAML'
+          cat > ~/.dbt/profiles.yml << YAML
           transformations:
             target: dev
             outputs:
