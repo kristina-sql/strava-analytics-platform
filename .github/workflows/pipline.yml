@@ -68,10 +68,25 @@ jobs:
           # Build DATABASE_URL for your load_to_neon.py
           export DATABASE_URL="postgresql://${NEON_USER}:${NEON_PASSWORD}@${NEON_HOST}:${NEON_PORT}/${NEON_DB}?sslmode=require"
           python ingestion/src/load_to_neon.py
-
+    
       - name: Run dbt (staging only)
         working-directory: transformations
         run: |
-          dbt deps
+          echo "PWD:"; pwd
+          echo "FILES:"; ls -la
+          echo "dbt_project.yml:"; ls -la dbt_project.yml
+          echo "packages.yml:"; ls -la packages.yml
+          echo "---- packages.yml content ----"
+          cat packages.yml
+      
+          echo "Running deps..."
+          dbt deps --debug
+      
+          echo "After deps, list dbt_packages:"
+          ls -la
+          ls -la dbt_packages || true
+          ls -la dbt_packages/dbt_utils || true
+      
           dbt debug
           dbt run --select stg_strava_activities
+
