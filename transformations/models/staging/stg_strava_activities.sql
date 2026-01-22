@@ -1,9 +1,8 @@
-{{ 
-    config(
-        materialized='view',
-        schema = 'raw'
-    ) 
-}}
+{{ config(
+    materialized='view',
+    schema = 'raw'
+) }}
+
 with source as (
     select
         activity_id,
