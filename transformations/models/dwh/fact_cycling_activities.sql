@@ -60,9 +60,9 @@ activities_enriched as (
         
     from source 
     left join {{ ref('dim_ftp') }} as ftp
-        on start_date_utc >= ftp.valid_from
-        and (start_date_utc <= ftp.valid_to or ftp.valid_to is null)
-        and ftp.athlete_id = 12345678
+        on start_date_utc::date >= ftp.valid_from
+        and ftp.valid_to is null
+        and ftp.athlete_id = athlete_id
 )
 
 select * 

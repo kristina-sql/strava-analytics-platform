@@ -3,10 +3,10 @@
 ) }}
 
 {% set zones = [
-  {'zone_number': 1, 'zone_name': 'Recovery',   'zone_label': 'Z1', 'low': 0.00, 'high': 0.81, 'fatigue_risk': 'Low',    'training_focus': 'Easy recovery, circulation'},
-  {'zone_number': 2, 'zone_name': 'Endurance',  'zone_label': 'Z2', 'low': 0.81, 'high': 0.89, 'fatigue_risk': 'Low',    'training_focus': 'Aerobic base, endurance'},
-  {'zone_number': 3, 'zone_name': 'Tempo',      'zone_label': 'Z3', 'low': 0.89, 'high': 0.94, 'fatigue_risk': 'Medium', 'training_focus': 'Sustainable hard, muscular endurance'},
-  {'zone_number': 4, 'zone_name': 'Threshold',  'zone_label': 'Z4', 'low': 0.94, 'high': 1.00, 'fatigue_risk': 'High',   'training_focus': 'Raise threshold, controlled discomfort'},
+  {'zone_number': 1, 'zone_name': 'Recovery',   'zone_label': 'Z1', 'low': 0.50, 'high': 0.60, 'fatigue_risk': 'Low',    'training_focus': 'Easy recovery, circulation'},
+  {'zone_number': 2, 'zone_name': 'Endurance',  'zone_label': 'Z2', 'low': 0.60, 'high': 0.70, 'fatigue_risk': 'Low',    'training_focus': 'Aerobic base, endurance'},
+  {'zone_number': 3, 'zone_name': 'Tempo',      'zone_label': 'Z3', 'low': 0.70, 'high': 0.80, 'fatigue_risk': 'Medium', 'training_focus': 'Sustainable hard, muscular endurance'},
+  {'zone_number': 4, 'zone_name': 'Threshold',  'zone_label': 'Z4', 'low': 0.80, 'high': 1.00, 'fatigue_risk': 'High',   'training_focus': 'Raise threshold, controlled discomfort'},
 ] %}
 
 with hr_reference as (

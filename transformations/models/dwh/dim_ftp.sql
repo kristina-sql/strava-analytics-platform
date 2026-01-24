@@ -4,7 +4,7 @@
 
 with ftp_tests as (
     select * from (values
-        (1, 12345678, 143, 2.69, '2025-11-24'::date, 'Standart 20 min', true)
+        (1, 12345678, 143, 2.69, '2025-01-01'::date, 'Standart 20 min', true)
         --(2, 12345678, 000, 0.00, '2026-01-24'::date, '20min test', false)
     ) as t(ftp_id, athlete_id, ftp_watts, ftp_wkg, test_date, test_type, is_current)
 )
