@@ -9,7 +9,7 @@ with activities as (
     avg_power_w,
     normalized_power,
     avg_hr
-  from {{ ref('fact_cycling_activities') }}
+  from {{ ref('fact_all_activities') }}
 ),
 
 ftp as (

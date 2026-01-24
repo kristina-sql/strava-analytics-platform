@@ -10,7 +10,7 @@ with activities as (
         activity_id,
         ftp_id,
         normalized_power
-    from {{ ref('fact_cycling_activities') }}
+    from {{ ref('fact_all_activities') }}
     where normalized_power is not null
 ),
 
