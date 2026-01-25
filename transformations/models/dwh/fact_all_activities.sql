@@ -3,6 +3,9 @@
     unique_key='activity_id'
 ) }}
 
+{% do log("this=" ~ this, info=True) %}
+{% do log("is_incremental=" ~ is_incremental(), info=True) %}
+
 with source as (
     select * 
     from {{ ref('stg_strava_activities') }}
