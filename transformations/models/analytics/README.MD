@@ -1,6 +1,6 @@
 # Virtual Cycling Performance Analytics 🚴‍♂️
 
-![Zwift Image](assets/images/zwift_image.jpeg)
+![Zwift Image](https://github.com/kristina-sql/strava-analytics-platform/blob/bcc70959fb7cf2462cf241f7195b2fd7a8d0fc19/assets/images/zwift_image.jpeg)
 
 ## Overview
 End-to-end analytics pipeline analyzing Virtual (Zwift) cycling data to track training load, physiological efficiency, and performance improvements over time. Built with dbt, automated with GitHub Actions and visualized in Looker Studio.
