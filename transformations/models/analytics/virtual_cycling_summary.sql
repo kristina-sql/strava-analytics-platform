@@ -144,8 +144,8 @@ date_spine as (
     from {{ ref('dim_date') }} d
     where d.date_id between
         (select min(activity_date) from rides)
-        and
-        (select max(activity_date) from rides)
+        and current_date
+        
 ),
 
 -- 6) Build final daily table 
