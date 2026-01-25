@@ -1,6 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key='activity_id'
+    unique_key='activity_id',
+    tags=['staging']
 ) }}
 
 {% do log("this=" ~ this, info=True) %}
