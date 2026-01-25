@@ -1,0 +1,206 @@
+version: 2
+
+models:
+  - name: virtual_cycling_summary
+    description: >
+      Daily aggregation of VirtualRide activities with performance metrics,
+      zone classifications, efficiency indicators, and rolling training load.
+      Includes rows for non-training days (ride_count = 0) for complete time series.
+
+     #to be added  enforcements and constraints to prevent duplicates at dbt build time
+    #config:
+      #contract:
+        #enforced: true
+
+    #constraints:
+      #- type: primary_key
+        #columns: [athlete_id, activity_date] 
+    
+    columns:
+      # Primary Keys
+      - name: athlete_id
+        description: Unique identifier for the athlete
+        tests:
+          - not_null
+      
+      - name: activity_date
+        description: Date of the training activity (or non-training day)
+        tests:
+          - not_null
+      
+      # Volume Metrics
+      - name: ride_count
+        description: Number of VirtualRide activities completed on this day (0 for rest days)
+        tests:
+          - accepted_values:
+              values: [0, 1]
+              quote: false # where ride_count not in (0, 1)
+      
+      - name: distance_km
+        description: Total distance in kilometers
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 300  # Adjust based on your max expected ride
+      
+      - name: duration_minutes
+        description: Total duration in minutes
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 360  # 6 hours max
+      
+      # Performance Metrics
+      - name: avg_speed_kmh_wt
+        description: Duration-weighted average speed in km/h
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 60
+              where: "ride_count > 0"
+      
+      - name: avg_power_w_wt
+        description: Duration-weighted average power in watts
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 500
+              where: "ride_count > 0"
+      
+      - name: normalized_power_wt
+        description: Duration-weighted normalized power in watts
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 500
+              where: "ride_count > 0"
+      
+      - name: avg_hr_bpm_wt
+        description: Duration-weighted average heart rate in BPM
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 60
+              max_value: 220
+              where: "ride_count > 0"
+      
+      # Zone Classifications
+      - name: power_zone_label
+        description: Power zone label (e.g., Z1, Z2, Z3, Z4)
+        tests:
+          - accepted_values:
+              values: ['Z1', 'Z2', 'Z3', 'Z4']
+              quote: true
+              where: "ride_count > 0"
+      
+      - name: hr_zone_label
+        description: Heart rate zone label
+        tests:
+          - accepted_values:
+              values: ['Z1', 'Z2', 'Z3', 'Z4']  # Adjust to your actual values
+              quote: true
+              where: "ride_count > 0"
+      
+      # Efficiency Metrics
+      - name: watts_per_bpm_wt
+        description: Duration-weighted watts per heart beat (key efficiency metric)
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 5
+              where: "ride_count > 0 and watts_per_bpm_wt is not null"
+      
+      - name: efficiency_factor_wt
+        description: Duration-weighted efficiency factor (NP / avg HR)
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 3
+              where: "ride_count > 0 and efficiency_factor_wt is not null"
+      
+      # Training Load
+      - name: tss_total
+        description: Training Stress Score for the day
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 500
+      
+      - name: intensity_factor_avg
+        description: Average intensity factor (NP / FTP)
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 2
+              where: "ride_count > 0 and intensity_factor_avg is not null"
+      
+      # Intensity Flags
+      - name: is_high_hr_zone
+        description: Flag indicating if the ride was in high HR zone (Z4)
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+              quote: false
+      
+      - name: is_high_power_zone
+        description: Flag indicating if the ride was in high power zone (Z4)
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+              quote: false
+      
+      # Rolling Metrics
+      - name: tss_7d
+        description: 7-day rolling sum of TSS (acute training load)
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 3500  # ~500 per day max
+      
+      - name: tss_28d
+        description: 28-day rolling sum of TSS (chronic training load)
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 14000  # ~500 per day max
+    
+    tests:
+      # Ensure unique combination of athlete and date
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - athlete_id
+            - activity_date
+      
+      # Ensure no gaps in date range
+      - dbt_utils.expression_is_true:
+          expression: "activity_date is not null"
+      
+      # Data quality: rides should have distance > 0
+      - dbt_utils.expression_is_true:
+          expression: "ride_count = 0 OR distance_km > 0"
+          config:
+            severity: warn
+      
+      # Data quality: rides should have duration > 0
+      - dbt_utils.expression_is_true:
+          expression: "ride_count = 0 OR duration_minutes > 0"
+          config:
+            severity: warn
+      
+      # Chronic load should always be >= acute load (over same period)
+      - dbt_utils.expression_is_true:
+          expression: "tss_28d >= tss_7d"
+          config:
+            severity: warn
+      
+      # Efficiency factor should be reasonable when present
+      - dbt_utils.expression_is_true:
+          expression: "efficiency_factor_wt is null OR efficiency_factor_wt > 0"
+          config:
+            severity: error
