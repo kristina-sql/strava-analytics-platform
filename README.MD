@@ -31,25 +31,9 @@ This repository also serves as a space to **experiment, learn, and exchange idea
 
 ---
 
-## Architecture (planned)
+## Architecture 
 
-    Strava API
-        │
-        ▼
-    Python (Ingestion)
-        │
-        ▼
-    PostgreSQL (Neon DB)
-    (Raw & Analytics Layers)
-        │
-        ▼
-    dbt
-    (Transformations & Modeling)
-        │
-        ▼
-    Looker
-    (Visualization)
-
+![architecture](https://github.com/kristina-sql/strava-analytics-platform/blob/1c2a35ba96bd011891b175352c986fa553e09248/assets/images/pipline_architecture.png)
 
 ---
 
