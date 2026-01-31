@@ -1,7 +1,6 @@
 import os
 import httpx
 from fastapi import FastAPI, Request, HTTPException
-from extract import main as run_extract
 
 app = FastAPI()
 
@@ -16,24 +15,28 @@ async def strava_callback(request: Request):
     if not code:
         raise HTTPException(status_code=400, detail="Missing code")
 
+    client_id = os.getenv("STRAVA_CLIENT_ID")
+    client_secret = os.getenv("STRAVA_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        raise HTTPException(status_code=500, detail="Missing STRAVA env vars")
+
     async with httpx.AsyncClient() as client:
         r = await client.post(
             "https://www.strava.com/oauth/token",
             json={
-                "client_id": os.environ["STRAVA_CLIENT_ID"],
-                "client_secret": os.environ["STRAVA_CLIENT_SECRET"],
+                "client_id": client_id,
+                "client_secret": client_secret,
                 "code": code,
                 "grant_type": "authorization_code",
             },
         )
 
-    token_data = r.json()
+    if r.status_code >= 400:
+        raise HTTPException(status_code=400, detail=r.text)
 
-    # TODO: store token_data in Neon
-    # access_token, refresh_token, expires_at, athlete.id
+    return {"status": "authorized", "token_data": r.json()}
 
-    return {"status": "authorized"}
-
-# for GitHub Actions behavior unchanged
+# CLI / GitHub Actions only (won't run under uvicorn)
 if __name__ == "__main__":
+    from extract import main as run_extract
     run_extract()
