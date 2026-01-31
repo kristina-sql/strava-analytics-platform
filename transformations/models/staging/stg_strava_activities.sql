@@ -6,6 +6,7 @@
 with source as (
     select
         activity_id,
+        athlete_id,
         extracted_at_utc,
         payload
     from {{ source('raw', 'strava_activities') }}
@@ -14,6 +15,7 @@ with source as (
 final as (
     select
         activity_id,
+        athlete_id,
 
         -- timestamps
         (payload->>'start_date')::timestamptz as start_date_utc,
@@ -53,3 +55,4 @@ final as (
 
 select * 
 from final
+where extract(year from start_date_utc) >= 2025 --need to consider adjust python to extract only what needed

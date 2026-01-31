@@ -14,7 +14,7 @@ with hr_reference as (
     athlete_id,
     added_at,
     max_hr as reference_bpm
-  from {{ ref('dim_athlete') }}
+  from {{ source('dwh', 'dim_athlete') }}
 ),
 
 hr_ref_scd as (

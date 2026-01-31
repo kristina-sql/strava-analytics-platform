@@ -3,10 +3,10 @@
     primary_key = ['athlete_id', 'activity_date'] 
 ) }}
 
--- this cte might look irrelevant since it is just myself in  the data, but will have it for future scaling purposes
+-- scaling is in progress (2 athletes must appear)
 with athlete as (
     select athlete_id
-    from {{ ref('dim_athlete') }}
+    from {{ source('dwh', 'dim_athlete') }}
 ),
 
 -- 1) filtering only VirtualRide activities 

@@ -9,3 +9,15 @@ sources:
     tables:
       - name: strava_activities
         description: Raw Strava data from API
+
+  - name: dwh
+    database: neondb
+    schema: dwh
+    description: ready to consume for analytical layer
+    
+    tables: 
+      - name: dim_athlete
+        description: > 
+          information about athlete,  needs to be manually added 
+          once athlete authorises in Strava API and will need to develop automated inserting 
+          based on user's input during onboarding, but it is already seperete UI+scripts developement
