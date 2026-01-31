@@ -61,7 +61,7 @@ jobs:
 
       - name: Run ingestion (creates raw snapshot files on runner)
         run: |
-          python main.py
+          python ingestion/src/main.py
 
       - name: Load raw snapshot into Neon
         run: |
