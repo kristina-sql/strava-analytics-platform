@@ -122,7 +122,7 @@ def fetch_all_tokens(cur) -> List[TokenRow]:
     cur.execute(
         """
         select athlete_id, access_token, refresh_token, expires_at
-        from strava_token
+        from public.strava_tokens
         where refresh_token is not null
         """
     )
@@ -145,7 +145,7 @@ def upsert_token(cur, athlete_id: int, access_token: str, refresh_token: str, ex
     """
     cur.execute(
         """
-        insert into strava_token (athlete_id, access_token, refresh_token, expires_at, updated_at)
+        insert into public.strava_tokens (athlete_id, access_token, refresh_token, expires_at, updated_at)
         values (%s, %s, %s, %s, now())
         on conflict (athlete_id) do update
           set access_token = excluded.access_token,
