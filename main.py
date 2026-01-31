@@ -1,35 +1,25 @@
 import os
 import httpx
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
+from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
 @app.get("/strava/callback")
 async def strava_callback(request: Request):
     code = request.query_params.get("code")
-    error = request.query_params.get("error")
-
-    if error:
-        raise HTTPException(status_code=400, detail="Authorization denied")
-
     if not code:
-        raise HTTPException(status_code=400, detail="Missing code")
-
-    client_id = os.getenv("STRAVA_CLIENT_ID")
-    client_secret = os.getenv("STRAVA_CLIENT_SECRET")
-
-    if not client_id or not client_secret:
-        raise HTTPException(status_code=500, detail="Missing STRAVA env vars")
+        return PlainTextResponse("Authorization failed.", status_code=400)
 
     async with httpx.AsyncClient() as client:
-        r = await client.post(
+        await client.post(
             "https://www.strava.com/oauth/token",
             json={
-                "client_id": client_id,
-                "client_secret": client_secret,
+                "client_id": os.getenv("STRAVA_CLIENT_ID"),
+                "client_secret": os.getenv("STRAVA_CLIENT_SECRET"),
                 "code": code,
                 "grant_type": "authorization_code",
             },
         )
 
-    return {"status": "authorized"}
+    return PlainTextResponse("Authorization successful. You can close this tab.")
