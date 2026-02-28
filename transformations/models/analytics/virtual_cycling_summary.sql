@@ -1,6 +1,6 @@
 {{ config(
     materialized = 'table',
-    primary_key = ['athlete_id', 'activity_date'] 
+    primary_key = ['athlete_id', 'activity_date', 'activity_id'] 
 ) }}
 
 -- scaling is in progress (2 athletes must appear)
@@ -18,7 +18,7 @@ rides as (
         activity_name,
         athlete_id,
         activity_date,
-        distance_m,
+        distance_km,
         duration_minutes,
         avg_speed_kmh,
         max_speed_kmh,
@@ -102,7 +102,7 @@ daily as (
         count(*) as ride_count, --to see 0 on days I havent trained (maybe will create calendar in looker)
 
         -- volumes
-        round(sum(distance_m) / 1000.0, 2) as distance_km,
+        round(sum(distance_km), 2) as distance_km,
         round(sum(duration_minutes), 2) as duration_minutes,
 
         -- performance (weighted by duration so short rides don’t dominate)

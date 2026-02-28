@@ -20,6 +20,7 @@ activities_enriched as (
         
         -- distance & time
         distance_m,
+        distance_km,
         round(moving_time_s / 60.0, 2) as duration_minutes,
         
         -- speed
