@@ -5,6 +5,7 @@
 with activities as (
   select
     activity_id,
+    athlete_id,
     activity_date,                    
     avg_power_w,
     normalized_power,
@@ -15,6 +16,7 @@ with activities as (
 ftp as (
   select
     ftp_id,
+    athlete_id,
     valid_from,
     valid_to,
     ftp_watts
@@ -32,8 +34,8 @@ activity_with_ftp as (
     a.avg_hr
   from activities a
   join ftp f
-    on a.activity_date >= f.valid_from
-
+    on  a.athlete_id = f.athlete_id
+    and a.activity_date >= f.valid_from
     --if this FTP row doesn’t have an end date yet, treat it as still valid,
     --otherwise model reads null as unknown but we need to see true or fale, unknown will be dropped
    and a.activity_date <  coalesce(f.valid_to, '2999-12-31'::date) 
